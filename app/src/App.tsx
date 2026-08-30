@@ -57,6 +57,7 @@ import {
   connectWallet,
   getInjectedProvider,
   parseChainId,
+  passiveWalletSyncFailureState,
   readWalletState,
   shortAddress,
   validateFreshWalletState,
@@ -152,13 +153,7 @@ function App() {
         if (!disposed) setWallet({ provider, ...state });
       } catch (error) {
         if (!disposed) {
-          setWallet({
-            provider,
-            address: null,
-            chainId: null,
-            status: "disconnected",
-            error: errorMessage(error),
-          });
+          setWallet(passiveWalletSyncFailureState(provider));
         }
       }
     };
@@ -205,7 +200,7 @@ function App() {
       setWallet({ provider, address: null, chainId: null, status: "disconnected" });
       setWallet(await connectWallet(provider));
     } catch (error) {
-      setWallet((current) => ({ ...current, provider, error: errorMessage(error) }));
+      setWallet((current) => ({ ...current, provider, error: errorMessage(error, "Wallet connection failed.") }));
     }
   };
 
@@ -224,7 +219,7 @@ function App() {
       try {
         freshState = await readWalletState(provider);
       } catch (error) {
-        const message = errorMessage(error);
+        const message = errorMessage(error, "Wallet state could not be verified before signing.");
         setWallet({ provider, address: null, chainId: null, status: "disconnected", error: message });
         setTxProgress({ stage: "FAILED", detail: message });
         throw new Error(message);

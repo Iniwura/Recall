@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { deriveActiveRecallCount, deriveBatchStatus, hostnameFromUrl, shortHash, sourcesMatchExactly } from "./format";
+import { deriveActiveRecallCount, deriveBatchStatus, errorMessage, hostnameFromUrl, shortHash, sourcesMatchExactly } from "./format";
 import type { Batch } from "./types";
 
 const baseBatch: Batch = {
@@ -54,5 +54,10 @@ describe("batch display helpers", () => {
     expect(deriveActiveRecallCount([{ batch: { ...baseBatch, recallActive: true }, batchId: 1 }], true)).toBeNull();
     expect(deriveActiveRecallCount([{ batch: null, batchId: 1, error: "read failed" }], false)).toBeNull();
     expect(deriveActiveRecallCount([{ batch: { ...baseBatch, recallActive: true }, batchId: 1 }], false)).toBe(1);
+  });
+
+  it("supports contextual fallbacks for non-Error failures", () => {
+    expect(errorMessage({ code: -32000 }, "Wallet state is unavailable.")).toBe("Wallet state is unavailable.");
+    expect(errorMessage(new Error("required read failed"))).toBe("required read failed");
   });
 });

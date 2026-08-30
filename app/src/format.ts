@@ -91,6 +91,9 @@ export function deriveActiveRecallCount(
   return rows.filter((row) => row.batch?.recallActive === true).length;
 }
 
-export function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "The requested state is unavailable.";
+export function errorMessage(
+  error: unknown,
+  fallback = "The requested state is unavailable.",
+): string {
+  return error instanceof Error && error.message ? error.message : fallback;
 }

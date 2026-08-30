@@ -110,6 +110,10 @@ export async function readWalletState(
   };
 }
 
+export function passiveWalletSyncFailureState(provider: Eip1193Provider): WalletState {
+  return { provider, address: null, chainId: null, status: "disconnected" };
+}
+
 export async function ensureBradburyNetwork(provider: Eip1193Provider): Promise<void> {
   const current = parseChainId(await provider.request({ method: "eth_chainId" }));
   if (isBradburyChain(current)) return;

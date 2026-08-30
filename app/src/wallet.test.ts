@@ -6,6 +6,7 @@ import {
   ensureBradburyNetwork,
   isBradburyChain,
   parseChainId,
+  passiveWalletSyncFailureState,
   readWalletState,
   validateFreshWalletState,
   walletAddressFromAccounts,
@@ -94,5 +95,11 @@ describe("wallet boundary", () => {
 
   it("accepts the unchanged connected Bradbury account", () => {
     expect(validateFreshWalletState({ address: "0x1111111111111111111111111111111111111111", chainId: 4221, status: "connected" }, "0x1111111111111111111111111111111111111111")).toBeNull();
+  });
+
+  it("does not turn a passive wallet sync failure into a global notice", () => {
+    const state = passiveWalletSyncFailureState(provider(async () => { throw { code: -32000 }; }));
+    expect(state).toEqual({ provider: state.provider, address: null, chainId: null, status: "disconnected" });
+    expect(state.error).toBeUndefined();
   });
 });
