@@ -295,9 +295,12 @@ authorization.
 
 ## Validation
 
-The Recall contract is already deployed on Bradbury. The frontend has been
-built and tested locally, and its source is committed and pushed to GitHub.
-A public frontend deployment has not yet been performed.
+The Recall contract is deployed on Bradbury. The frontend has been built,
+tested, committed, and pushed to GitHub, and the production command center is
+publicly deployed at https://recall-silk-five.vercel.app/.
+
+The live Batch 1 demonstration is available at
+https://recall-silk-five.vercel.app/#/batch/1.
 
 The Direct Mode suite covers registration and immutability, owner lifecycle and
 versioning, complete-source assessment gating, prompt-injection boundaries,
