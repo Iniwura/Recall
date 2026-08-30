@@ -3,8 +3,5 @@ __pycache__/
 .pytest_cache/
 .venv/
 deploy/deployScript.compiled.js
-*.zip
-__pycache__/
-.pytest_cache/
-.venv/
-deploy/deployScript.compiled.js
+app/node_modules/
+app/dist/

@@ -266,11 +266,38 @@ Python 3.12+ is required. Install the pinned live-consumer dependency with:
 python3 -m pip install -r requirements-consumer.txt
 ```
 
+## Frontend command center
+
+The production submission frontend lives in `app/` and uses React, TypeScript,
+Vite, and the pinned `genlayer-js@1.1.8` browser SDK. Python 3.12+ is required
+for the live consumer; the frontend itself uses Node.js and npm.
+
+From the project directory:
+
+```text
+cd app
+npm install
+npm run dev
+```
+
+Routes are `#/command`, `#/registry`, `#/batch/1`, `#/assessments`,
+`#/register`, `#/owner`, and `#/about`. Public reads are wallet-free and use
+Bradbury latest-nonfinal state. Writes use an injected EIP-1193 wallet only
+after account and chain verification; the browser uses direct provider requests
+and never executes refunds, replacements, payouts, or backend redemption. A
+write is shown as `RECORDED` only after the expected contract state is observed.
+The durable `recall-redeem` consumer remains the independent fail-closed
+downstream enforcement demonstration.
+
+Recall expects text/JSON-style UTF-8 evidence endpoints; binary/non-UTF8
+resources are treated as incomplete evidence and cannot support decisive
+authorization.
+
 ## Validation
 
-This project has undergone deterministic local validation, GenVM validation of
-the unchanged contract, and read-only Bradbury live smoke verification of the
-consumer. It does not deploy, build a frontend, commit, or push.
+The Recall contract is already deployed on Bradbury. This frontend has been
+built and tested locally, but has not yet been publicly deployed. This frontend
+work has not yet been committed or pushed.
 
 The Direct Mode suite covers registration and immutability, owner lifecycle and
 versioning, complete-source assessment gating, prompt-injection boundaries,
