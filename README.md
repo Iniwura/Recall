@@ -11,6 +11,28 @@ batch-level authorization signal. Recall makes the sealed batch identity and
 recall policy the adjudication context, fetches the complete declared source
 set itself, and records a consensus assessment history.
 
+## Deployed Bradbury instance
+
+The canonical deployed Recall contract is
+`0x876Eb31536FfB3eF448dbdeB905118E70761981C` on Bradbury
+(`https://rpc-bradbury.genlayer.com`). Its deployment transaction is
+`0x63c15a960dd194ec2ba5fd45eb836b8f5e1c8b80600a9edee77d896858f648b9` and the
+audited contract SHA-256 is
+`e24be49b6d113409eef24b9eafa7f3b92494b5a731cea21ded10748e044338b3`.
+
+The live proof for Batch 1 is FDA lot `4032183`, with `AFFECTED`, `BOUND`, and
+`recall_active == true`. The assessment transaction is
+`0xba8afedf37bfb78455f477b0c08c4667656d89f6cbfc5fc4a892a0cbdc5ccbc4`.
+The CLI initially timed out while polling that transaction, but authoritative
+subsequent contract reads showed `assessment_count == 1` and the recorded
+`AFFECTED` / `BOUND` assessment.
+
+The durable downstream consumer performs a fresh Bradbury
+`recall_active(batch_id)` read immediately before authorizing a protected
+operation and fails closed on false, malformed, or failed reads. It authorizes
+a downstream system only; no real monetary refund or replacement is claimed
+here. The browser UI is not a refund executor.
+
 ## Lifecycle
 
 ```text
@@ -209,10 +231,46 @@ invocation. Only an explicit boolean `true` permits the callback.
 The browser is not a payout/refund executor and no authorization decision is
 cached by the gate.
 
+## Live command consumer
+
+`recall-redeem` is the backend/CI enforcement command. It performs one fresh
+Bradbury `recall_active(batch_id)` read immediately before invoking the supplied
+downstream argument vector, never concatenates a shell command, never retries
+the downstream command, and never caches a positive read:
+
+```text
+./recall-redeem --batch-id 1 -- python3 -c 'print("RECALL_REDEMPTION_GATE_EXECUTED")'
+```
+
+The read uses the installed `genlayer-py` client with
+`testnet_bradbury`, `client.read_contract(function_name="recall_active",
+args=[batch_id], transaction_hash_variant=LATEST_NONFINAL)`, and an
+address-only read sender; no browser wallet or signing key is required. The
+defaults can be overridden with `RECALL_CONTRACT_ADDRESS`, `RECALL_RPC_URL`,
+`RECALL_NETWORK_ID`, and `RECALL_READ_TIMEOUT_SECONDS`. Exit codes are `10` for
+explicit inactive recall, `11` for authorization/read failure, and `12` for a
+downstream failure. Each attempt emits a concise JSON audit record without RPC
+credentials or other secret environment values.
+
+The SDK provider in `genlayer-py==0.16.3` uses `requests.post` without a native
+timeout. The adapter's supervisory daemon-thread timeout safely fails closed
+for the one-shot `recall-redeem` process. In a long-lived embedding, the
+underlying read thread may continue until the process exits; it is not
+force-terminated.
+
+## Consumer installation
+
+Python 3.12+ is required. Install the pinned live-consumer dependency with:
+
+```text
+python3 -m pip install -r requirements-consumer.txt
+```
+
 ## Validation
 
-This project intentionally stops at implementation and local validation. It
-does not deploy, build a frontend, commit, or push.
+This project has undergone deterministic local validation, GenVM validation of
+the unchanged contract, and read-only Bradbury live smoke verification of the
+consumer. It does not deploy, build a frontend, commit, or push.
 
 The Direct Mode suite covers registration and immutability, owner lifecycle and
 versioning, complete-source assessment gating, prompt-injection boundaries,
@@ -231,7 +289,12 @@ genvm-lint lint contracts/recall.py
 genvm-lint validate contracts/recall.py
 genvm-lint schema contracts/recall.py
 genvm-lint typecheck contracts/recall.py
-python3 -m py_compile contracts/recall.py execution/recall_redemption_gate.py
+python3 -m py_compile \
+  contracts/recall.py \
+  execution/recall_redemption_gate.py \
+  execution/recall_live_adapter.py \
+  execution/recall_redeem.py \
+  test/test_recall_live_consumer.py
 grep -nE '@staticmethod|ValueError' contracts/recall.py || echo PASS
 ```
 
@@ -240,7 +303,12 @@ grep -nE '@staticmethod|ValueError' contracts/recall.py || echo PASS
 ```text
 contracts/recall.py                 Recall Intelligent Contract
 execution/recall_redemption_gate.py Fail-closed downstream consumer
+execution/recall_live_adapter.py   Read-only Bradbury contract adapter
+execution/recall_redeem.py          Protected downstream command CLI
+requirements-consumer.txt           Pinned live-consumer runtime dependency
+recall-redeem                       Executable CLI entry point
 test/test_recall.py                 Direct Mode adversarial contract suite
 test/test_execution_gate.py         Redemption-gate unit tests
+test/test_recall_live_consumer.py   Deterministic adapter and CLI tests
 pytest.ini                          Direct Mode test path configuration
 ```
