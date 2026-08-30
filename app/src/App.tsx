@@ -144,6 +144,10 @@ function App() {
   }, []);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [route]);
+
+  useEffect(() => {
     const provider = getInjectedProvider();
     if (!provider) return;
     let disposed = false;
@@ -312,7 +316,8 @@ function screenProps(navigate: ScreenProps["navigate"], wallet: WalletState, per
 }
 
 function isRouteActive(route: Route, path: string): boolean {
-  if (path === "#/command") return route.name === "overview" || route.name === "batch";
+  if (path === "#/command") return route.name === "overview";
+  if (path === "#/registry") return route.name === "registry" || route.name === "batch";
   return path.includes(route.name);
 }
 

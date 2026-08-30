@@ -129,7 +129,11 @@ code, .mono-link, .wallet-address, .incident-active, .muted, .header-note, .eyeb
 .detail-hero-state small { font: 9px var(--mono); color: var(--muted); }
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 50px; }
 .detail-section { padding: 31px 0 36px; border-bottom: 1px solid var(--line); min-width: 0; }
-.identity-section, .governance-section, .timeline-section, .assessment-form { grid-column: 1 / -1; }
+.identity-section, .governance-section, .timeline-section, .assessment-form, .reasoning-section { grid-column: 1 / -1; }
+.reasoning-section { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 36px; }
+.reasoning-section > .section-title, .reasoning-section > .assessment-meta, .reasoning-section > .commitment-row, .reasoning-section > .callout { grid-column: 1 / -1; }
+.reasoning-section > .long-field { min-width: 0; }
+.reasoning-section .commitment-row code { min-width: 0; overflow: hidden; overflow-wrap: normal; text-overflow: ellipsis; white-space: nowrap; }
 .section-title { display: flex; align-items: center; gap: 13px; margin-bottom: 25px; }
 .section-index { font: 12px var(--mono); color: var(--red-dark); border: 1px solid var(--red-dark); width: 24px; height: 24px; display: inline-grid; place-items: center; }
 .section-title h3 { font-size: 20px; letter-spacing: -.05em; margin: 0; }
@@ -308,6 +312,7 @@ input::placeholder, textarea::placeholder { color: #a19e95; }
   .detail-hero-state { border-left: 0; border-top: 1px solid var(--line); padding: 17px 0 0; min-width: 0; }
   .detail-grid { display: block; }
   .detail-section { padding: 27px 0 30px; }
+  .reasoning-section { display: block; }
   .section-title { align-items: flex-start; flex-wrap: wrap; }
   .section-note { width: 100%; margin: 0 0 0 37px; }
   .data-grid { grid-template-columns: 1fr 1fr; gap: 20px 14px; }
