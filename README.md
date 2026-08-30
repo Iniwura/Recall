@@ -295,9 +295,9 @@ authorization.
 
 ## Validation
 
-The Recall contract is already deployed on Bradbury. This frontend has been
-built and tested locally, but has not yet been publicly deployed. This frontend
-work has not yet been committed or pushed.
+The Recall contract is already deployed on Bradbury. The frontend has been
+built and tested locally, and its source is committed and pushed to GitHub.
+A public frontend deployment has not yet been performed.
 
 The Direct Mode suite covers registration and immutability, owner lifecycle and
 versioning, complete-source assessment gating, prompt-injection boundaries,
